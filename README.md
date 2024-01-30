@@ -1,6 +1,6 @@
 # news_watch
 
-A new Flutter project.
+News App
 
 ## Getting Started
 
