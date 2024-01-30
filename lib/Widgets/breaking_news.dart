@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:news_api_flutter_package/model/article.dart';
+import 'package:news_api_flutter_package/model/error.dart';
+import 'package:news_api_flutter_package/news_api_flutter_package.dart';
 import 'package:news_watch/Models/article_screen.dart';
 import 'package:news_watch/Widgets/image_widget.dart';
 
 import '../Views/artical_main_screen.dart';
 
 class BreakingNews extends StatelessWidget {
-  const BreakingNews({
+  final NewsAPI newsAPI = NewsAPI("e5ef803bf7b64de4b21da03a663492e7");
+   BreakingNews({
     super.key,
     required this.articles,
   });
 
-  final List<Article> articles;
+  final List<Articles> articles;
 
   @override
   Widget build(BuildContext context) {
@@ -34,50 +38,58 @@ class BreakingNews extends StatelessWidget {
           const SizedBox(height: 20),
           SizedBox(
             height: 250,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: articles.length,
-              itemBuilder: (context, index) {
-                return Container(
-                  width: MediaQuery.of(context).size.width * 0.5,
-                  margin: const EdgeInsets.only(right: 10),
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.pushNamed(
-                        context,
-                        ArticleScreen.route,
-                        arguments: articles[index],
-                      );
-                    },
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ImageContainer(
-                          width: MediaQuery.of(context).size.width * 0.5,
-                          imageUrl: articles[index].imageUrl,
+            child: FutureBuilder<List<Article>>(
+              future: newsAPI.getTopHeadlines(country: "us"),
+              builder: (BuildContext context, AsyncSnapshot<List<Article>> articless)  {
+                return articless.connectionState == ConnectionState.done
+              ? articless.hasData
+                  ?  ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: articless.data!.length,
+                  itemBuilder: (context, index) {
+                    return Container(
+                      width: MediaQuery.of(context).size.width * 0.5,
+                      margin: const EdgeInsets.only(right: 10),
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.pushNamed(
+                            context,
+                            ArticleScreen.route,
+                            arguments: articless.data![index],
+                          );
+                        },
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ImageContainer(
+                              width: MediaQuery.of(context).size.width * 0.5,
+                              imageUrl: articless.data![index].urlToImage,
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              articless.data![index].title!,
+                              maxLines: 2,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyLarge!
+                                  .copyWith(
+                                      fontWeight: FontWeight.bold, height: 1.5),
+                            ),
+                            const SizedBox(height: 5),
+                            Text(
+                                '${articless.data![index].publishedAt} hours ago',
+                                style: Theme.of(context).textTheme.bodySmall),
+                            const SizedBox(height: 5),
+                            Text('by ${articless.data![index].author}',
+                                style: Theme.of(context).textTheme.bodySmall),
+                          ],
                         ),
-                        const SizedBox(height: 10),
-                        Text(
-                          articles[index].title,
-                          maxLines: 2,
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyLarge!
-                              .copyWith(
-                                  fontWeight: FontWeight.bold, height: 1.5),
-                        ),
-                        const SizedBox(height: 5),
-                        Text(
-                            '${DateTime.now().difference(articles[index].createdAt).inHours} hours ago',
-                            style: Theme.of(context).textTheme.bodySmall),
-                        const SizedBox(height: 5),
-                        Text('by ${articles[index].author}',
-                            style: Theme.of(context).textTheme.bodySmall),
-                      ],
-                    ),
-                  ),
-                );
-              },
+                      ),
+                    );
+                  },
+                ): _buildError(articless.error as ApiError)
+              : _buildProgress();
+              }
             ),
           ),
         ],
@@ -85,4 +97,30 @@ class BreakingNews extends StatelessWidget {
     );
   }
 }
+
+
+  Widget _buildProgress() {
+    return Center(child: CircularProgressIndicator());
+  }
+
+  Widget _buildError(ApiError error) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              error.code ?? "",
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 20),
+            ),
+            SizedBox(height: 4),
+            Text(error.message!, textAlign: TextAlign.center),
+          ],
+        ),
+      ),
+    );
+  }
+
 

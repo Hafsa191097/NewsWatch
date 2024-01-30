@@ -24,10 +24,10 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialRoute: '/',
       routes: {
-        HomeScreen.route : (context) =>  const HomeScreen(),
+        HomeScreen.route : (context) =>   HomeScreen(),
         SearchScreen.route : (context) =>  const SearchScreen(),
         ProfileScreen.route : (context) =>  const ProfileScreen(),
-        ArticleScreen.route : (context) =>  const ArticleScreen(),
+        ArticleScreen.route : (context) =>   ArticleScreen(),
       },
     );
   }

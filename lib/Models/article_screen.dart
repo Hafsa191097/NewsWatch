@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-class Article extends Equatable {
+class Articles extends Equatable {
   final String id;
   final String title;
   final String subtitle;
@@ -12,7 +12,7 @@ class Article extends Equatable {
   final int views;
   final DateTime createdAt;
 
-  const Article({
+  const Articles({
     required this.id,
     required this.title,
     required this.subtitle,
@@ -25,8 +25,8 @@ class Article extends Equatable {
     required this.createdAt,
   });
 
-  static List<Article> articles = [
-    Article(
+  static List<Articles> articles = [
+    Articles(
       id: '1',
       title:
           'Lorem ipsum dolor sit amet, consectetur elit. Cras molestie maximus',
@@ -43,7 +43,7 @@ class Article extends Equatable {
           'https://images.unsplash.com/photo-1656106534627-0fef76c8b042?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=987&q=80',
       createdAt: DateTime.now().subtract(const Duration(hours: 5)),
     ),
-    Article(
+    Articles(
       id: '2',
       title:
           'Sed sed molestie libero, et massa. Donec auctor vestibulum pellentesque',
@@ -60,7 +60,7 @@ class Article extends Equatable {
           'https://images.unsplash.com/photo-1574280363402-2f672940b871?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=987&q=80',
       createdAt: DateTime.now().subtract(const Duration(hours: 6)),
     ),
-    Article(
+    Articles(
       id: '3',
       title:
           'Aliquam ullamcorper ipsum, vel consequat sem finibus a. Donec lobortis',
@@ -77,7 +77,7 @@ class Article extends Equatable {
           'https://images.unsplash.com/photo-1616832880334-b1004d9808da?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1336&q=80',
       createdAt: DateTime.now().subtract(const Duration(hours: 8)),
     ),
-    Article(
+    Articles(
       id: '4',
       title: 'Proin mattis nec lorem at rutrum. Curabitur sit augue vel',
       subtitle:
@@ -93,7 +93,7 @@ class Article extends Equatable {
           'https://images.unsplash.com/photo-1653587416464-8a99cc74d192?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=974&q=80',
       createdAt: DateTime.now().subtract(const Duration(hours: 19)),
     ),
-    Article(
+    Articles(
       id: '5',
       title:
           'Donec lobortis lectus a iaculis rutrum. Vestibulum libero sit amet',

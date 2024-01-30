@@ -51,7 +51,7 @@ class _CategoryNews extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final articles = Article.articles;
+    final articles = Articles.articles;
     return SingleChildScrollView(
       child: Column(
         children: [

@@ -14,7 +14,7 @@ class ImageContainer extends StatelessWidget {
 
   final double width;
   final double height;
-  final String imageUrl;
+  final String? imageUrl;
   final EdgeInsets? padding;
   final EdgeInsets? margin;
   final double borderRadius;
@@ -30,7 +30,7 @@ class ImageContainer extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         image: DecorationImage(
-          image: NetworkImage(imageUrl),
+          image: NetworkImage(imageUrl!),
           fit: BoxFit.cover,
         ),
       ),

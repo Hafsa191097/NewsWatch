@@ -10,7 +10,7 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Article article = Article.articles[0];
+    Articles article = Articles.articles[0];
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -26,7 +26,7 @@ class HomeScreen extends StatelessWidget {
       extendBodyBehindAppBar: true,
       body:  ListView(padding: EdgeInsets.zero, children: [
         NewsOfTheDay(article: article),
-        BreakingNews(articles: Article.articles),
+        BreakingNews(articles: Articles.articles),
         ],
       ),
       bottomNavigationBar: const NavigationnBar(index: 0,)
