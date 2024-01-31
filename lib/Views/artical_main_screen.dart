@@ -1,11 +1,8 @@
-import 'dart:developer';
-
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:news_api_flutter_package/model/article.dart';
 import 'package:news_api_flutter_package/news_api_flutter_package.dart';
 import 'package:news_watch/sources/api_error.dart';
-
-import '../Models/article_screen.dart';
 import '../Widgets/image_widget.dart';
 import '../Widgets/tags.dart';
 
@@ -38,7 +35,7 @@ class ArticleScreen extends StatelessWidget {
             body: ListView(
               children: [
                 _NewsHeadline(article: article),
-                // _NewsBody(article: article)
+                _NewsBody(article: article)
               ],
             ),
           ),
@@ -72,8 +69,12 @@ class _NewsBody extends StatelessWidget {
         future: Future.value(article),
         builder:  (BuildContext context, AsyncSnapshot<Article> snapshot) {
           
+          // String dateTimeString = snapshot.data!.publishedAt!;
+          // DateTime dateTime = DateTime.parse(dateTimeString);
+
+          // String formattedTime = DateFormat.Hm().format(dateTime);
           return snapshot.connectionState == ConnectionState.done
-              ? snapshot.hasData
+              ? snapshot.hasData 
                   ? Column(
             children: [
               Row(
@@ -89,7 +90,7 @@ class _NewsBody extends StatelessWidget {
                       ),
                       const SizedBox(width: 10),
                       Text(
-                        snapshot.data!.author!,
+                        snapshot.data!.author ?? 'Unknown Writer',
                         style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                               color: Colors.white,
                             ),
@@ -106,27 +107,19 @@ class _NewsBody extends StatelessWidget {
                       ),
                       const SizedBox(width: 10),
                       Text(
-                        '${snapshot.data!.publishedAt}h',
+                        '${DateFormat.Hm().format(DateTime.parse(snapshot.data!.publishedAt!))} h',
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
                     ],
                   ),
                   const SizedBox(width: 10),
-                  CustomTag(
-                    backgroundColor: Colors.grey.shade200,
-                    children: const[
-                       Icon(
-                        Icons.remove_red_eye,
-                        color: Colors.grey,
-                      ),
-                       SizedBox(width: 10),
-                      
-                    ],
-                  ),
+                  
                 ],
               ),
+              
               const SizedBox(height: 20),
               Text(
+                
                 snapshot.data!.title!,
                 style: Theme.of(context)
                     .textTheme
@@ -179,9 +172,8 @@ class _NewsHeadline extends StatelessWidget {
         future: Future.value(article),
         builder: (BuildContext context, AsyncSnapshot<Article> articless)  {
           
-          log(articless.data!.source.category!);
           return articless.connectionState == ConnectionState.done
-              && articless.hasData
+              ? articless.hasData
                   ?  Column(
             mainAxisAlignment: MainAxisAlignment.end,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -190,12 +182,12 @@ class _NewsHeadline extends StatelessWidget {
                 height: MediaQuery.of(context).size.height * 0.15,
               ),
               CustomTag(
-                
                 backgroundColor: Colors.grey.withAlpha(150),
                 children: [
                   Text(
-                    
-                    articless.data!.source.category!,
+                    maxLines: 1, 
+                    overflow: TextOverflow.ellipsis, 
+                    articless.data!.author ?? 'Unknown Writer',
                     style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                           color: Colors.white,
                         ),
@@ -204,6 +196,8 @@ class _NewsHeadline extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               Text(
+                maxLines: 3, 
+                overflow: TextOverflow.ellipsis, 
                 articless.data!.title!,
                 style: Theme.of(context).textTheme.headlineSmall!.copyWith(
                       fontWeight: FontWeight.bold,
@@ -220,8 +214,8 @@ class _NewsHeadline extends StatelessWidget {
                     .copyWith(color: Colors.white),
               ),
             ],
-          ) : _buildError(articless.error is ApiError ? articless.error as ApiError : ApiError("Unknown error",'404'));
-
+          ) : _buildError(articless.error is ApiError ? articless.error as ApiError : ApiError("Unknown error",'404'))
+            : _buildProgress();
              
         }
       ),

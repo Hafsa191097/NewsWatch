@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-
-import '../Models/article_screen.dart';
+import 'package:news_api_flutter_package/model/article.dart';
+import 'package:news_watch/sources/api_error.dart';
+import 'package:news_watch/sources/newsapi_pkg.dart';
 import '../Widgets/image_widget.dart';
 import '../Widgets/navigationbar.dart';
 import 'artical_main_screen.dart';
@@ -42,114 +43,114 @@ class SearchScreen extends StatelessWidget {
 }
 
 class _CategoryNews extends StatelessWidget {
-  const _CategoryNews({
-    Key? key,
+   _CategoryNews({
     required this.tabs,
-  }) : super(key: key);
+  });
 
   final List<String> tabs;
-
+  
+  final NewsAPI newsAPI = NewsAPI("e5ef803bf7b64de4b21da03a663492e7");
   @override
   Widget build(BuildContext context) {
-    final articles = Articles.articles;
     return SingleChildScrollView(
-      child: Column(
-        children: [
-          TabBar(
-            isScrollable: true,
-            indicatorColor: Colors.black,
-            tabs: tabs
-                .map(
-                  (tab) => Tab(
-                    icon: Text(
-                      tab,
-                      style: Theme.of(context).textTheme.headlineSmall!.copyWith(
-                            fontWeight: FontWeight.bold,fontSize: 20,
-                          ),
-                    ),
-                  ),
-                )
-                .toList(),
-          ),
-          SizedBox(
-            height: MediaQuery.of(context).size.height,
-            child: TabBarView(
-              children: tabs
-                  .map(
-                    (tab) => ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: articles.length,
-                      itemBuilder: ((context, index) {
-                        return InkWell(
-                          onTap: () {
-                            Navigator.pushNamed(
-                              context,
-                              ArticleScreen.route,
-                              arguments: articles[index],
-                            );
-                          },
-                          child: Row(
-                            children: [
-                              ImageContainer(
-                                width: 90,
-                                height: 80,
-                                margin: const EdgeInsets.all(10.0),
-                                borderRadius: 2,
-                                imageUrl: articles[index].imageUrl,
+      child: FutureBuilder<List<Article>>(
+        future: newsAPI.getTopHeadlines(country: "us"),
+        builder: (BuildContext context, AsyncSnapshot<List<Article>> articless)  {
+          return articless.connectionState == ConnectionState.done
+              ? articless.hasData
+                  ?   Column(
+            children: [
+              TabBar(
+                isScrollable: true,
+                indicatorColor: Colors.black,
+                tabs: tabs
+                    .map(
+                      (tab) => Tab(
+                        icon: Text(
+                          tab,
+                          style: Theme.of(context).textTheme.headlineSmall!.copyWith(
+                                fontWeight: FontWeight.bold,fontSize: 20,
                               ),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      articles[index].title,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.clip,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyLarge!
-                                          .copyWith(
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                    ),
-                                    const SizedBox(height: 10),
-                                    Row(
+                        ),
+                      ),
+                    )
+                    .toList(),
+              ),
+              SizedBox(
+                height: MediaQuery.of(context).size.height,
+                child: TabBarView(
+                  children: tabs
+                      .map(
+                        (tab) => ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: articless.data!.length,
+                          itemBuilder: ((context, index) {
+                            return InkWell(
+                              onTap: () {
+                                Navigator.pushNamed(
+                                  context,
+                                  ArticleScreen.route,
+                                  arguments: articless.data![index],
+                                );
+                              },
+                              child: Row(
+                                children: [
+                                  ImageContainer(
+                                    width: 90,
+                                    height: 80,
+                                    margin: const EdgeInsets.all(10.0),
+                                    borderRadius: 2,
+                                    imageUrl: articless.data![index].urlToImage,
+                                  ),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        const Icon(
-                                          Icons.schedule,
-                                          size: 18,
-                                        ),
-                                        const SizedBox(width: 5),
                                         Text(
-                                          '${DateTime.now().difference(articles[index].createdAt).inHours} hours ago',
-                                          style: const TextStyle(fontSize: 12),
+                                          articless.data![index].title!,
+                                          maxLines: 2,
+                                          overflow: TextOverflow.clip,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyLarge!
+                                              .copyWith(
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                         ),
-                                        const SizedBox(width: 20),
-                                        const Icon(
-                                          Icons.visibility,
-                                          size: 18,
-                                        ),
-                                        const SizedBox(width: 5),
-                                        Text(
-                                          '${articles[index].views} views',
-                                          style: const TextStyle(fontSize: 12),
+                                        const SizedBox(height: 10),
+                                        Row(
+                                          children: [
+                                            const Icon(
+                                              Icons.schedule,
+                                              size: 18,
+                                            ),
+                                            const SizedBox(width: 5),
+                                            Text(
+                                              '${articless.data![index].publishedAt} hours ago',
+                                              style: const TextStyle(fontSize: 12),
+                                            ),
+                                            const SizedBox(width: 20),
+                                            
+                                            
+                                          ],
                                         ),
                                       ],
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                        );
-                      }),
-                    ),
-                  )
-                  .toList(),
-            ),
-          )
-        ],
+                            );
+                          }),
+                        ),
+                      )
+                      .toList(),
+                ),
+              )
+            ],
+          ): _buildError(articless.error as ApiError)
+              : _buildProgress();
+        }
       ),
     );
   }
@@ -208,3 +209,31 @@ class _DiscoverNews extends StatelessWidget {
     );
   }
 }
+
+
+
+  Widget _buildProgress() {
+    return Center(child: CircularProgressIndicator());
+  }
+
+  Widget _buildError(ApiError error) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              error.code ?? "",
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 20),
+            ),
+            SizedBox(height: 4),
+            Text(error.message!, textAlign: TextAlign.center),
+          ],
+        ),
+      ),
+    );
+  }
+
+

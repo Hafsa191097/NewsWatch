@@ -44,6 +44,8 @@ class NewsOfTheDay extends StatelessWidget {
                         ),
                     const SizedBox(height: 10),
                     Text(
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 3,
                       snapshot.data!.first.description!,
                       style: Theme.of(context).textTheme.headlineSmall!.copyWith(
                           fontWeight: FontWeight.bold, height: 1.25, color: Colors.white),

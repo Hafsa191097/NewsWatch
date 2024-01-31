@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:news_api_flutter_package/model/article.dart';
 import 'package:news_api_flutter_package/model/error.dart';
 import 'package:news_api_flutter_package/news_api_flutter_package.dart';
@@ -41,12 +42,17 @@ class BreakingNews extends StatelessWidget {
             child: FutureBuilder<List<Article>>(
               future: newsAPI.getTopHeadlines(country: "us"),
               builder: (BuildContext context, AsyncSnapshot<List<Article>> articless)  {
+
                 return articless.connectionState == ConnectionState.done
               ? articless.hasData
                   ?  ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: articless.data!.length,
                   itemBuilder: (context, index) {
+                  String dateTimeString = articless.data![index].publishedAt!;
+                  DateTime dateTime = DateTime.parse(dateTimeString);
+
+                  String formattedTime = DateFormat.Hm().format(dateTime);
                     return Container(
                       width: MediaQuery.of(context).size.width * 0.5,
                       margin: const EdgeInsets.only(right: 10),
@@ -77,10 +83,10 @@ class BreakingNews extends StatelessWidget {
                             ),
                             const SizedBox(height: 5),
                             Text(
-                                '${articless.data![index].publishedAt} hours ago',
+                                '${formattedTime} Am',
                                 style: Theme.of(context).textTheme.bodySmall),
                             const SizedBox(height: 5),
-                            Text('by ${articless.data![index].author}',
+                            Text('by ${articless.data![index].author ?? 'Unknown Writer'} ',
                                 style: Theme.of(context).textTheme.bodySmall),
                           ],
                         ) : const Center(child: Icon(Icons.error, color: Colors.redAccent,),),
