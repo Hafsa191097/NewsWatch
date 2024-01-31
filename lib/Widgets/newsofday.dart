@@ -23,61 +23,61 @@ class NewsOfTheDay extends StatelessWidget {
         return snapshot.connectionState == ConnectionState.done
               ? snapshot.hasData
                   ? ImageContainer(
-              height: MediaQuery.of(context).size.height * 0.45,
-              width: double.infinity,
-              padding: const EdgeInsets.all(20.0),
-              imageUrl: snapshot.data!.last.urlToImage,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  CustomTag(
-                    backgroundColor: Colors.grey.withAlpha(150),
-                    children: [
-                      Text(
-                        'News of the Day',
-                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                              color: Colors.white,
+                    height: MediaQuery.of(context).size.height * 0.45,
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(20.0),
+                    imageUrl: snapshot.data!.first.urlToImage,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        CustomTag(
+                          backgroundColor: Colors.grey.withAlpha(150),
+                          children: [
+                            Text(
+                              'News of the Day',
+                              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                                    color: Colors.white,
+                                  ),
                             ),
-                      ),
-                    ],
-                  ),
-              const SizedBox(height: 10),
-              Text(
-                snapshot.data!.first.description!,
-                style: Theme.of(context).textTheme.headlineSmall!.copyWith(
-                    fontWeight: FontWeight.bold, height: 1.25, color: Colors.white),
-              ),
-              TextButton(
-                onPressed: () {},
-                style: TextButton.styleFrom(padding: EdgeInsets.zero),
-                child: Row(
-                  children: [
+                          ],
+                        ),
+                    const SizedBox(height: 10),
                     Text(
-                      'Learn More',
-                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                      snapshot.data!.first.description!,
+                      style: Theme.of(context).textTheme.headlineSmall!.copyWith(
+                          fontWeight: FontWeight.bold, height: 1.25, color: Colors.white),
+                    ),
+                    TextButton(
+                      onPressed: () {},
+                      style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                      child: Row(
+                        children: [
+                          Text(
+                            'Learn More',
+                            style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                                  color: Colors.white,
+                                ),
+                          ),
+                          const SizedBox(width: 10),
+                          const Icon(
+                            Icons.arrow_right_alt,
                             color: Colors.white,
                           ),
-                    ),
-                    const SizedBox(width: 10),
-                    const Icon(
-                      Icons.arrow_right_alt,
-                      color: Colors.white,
+                        ],
+                      ),
                     ),
                   ],
                 ),
-              ),
-            ],
-          ),
-        ) : _buildError(snapshot.error as ApiError)
-              : _buildProgress();
+              ) : const Center(child: Icon(Icons.error, color: Colors.redAccent,),)
+            : _buildProgress();
       }
     );
   }
 }
 
   Widget _buildProgress() {
-    return Center(child: CircularProgressIndicator());
+    return const Center(child: CircularProgressIndicator());
   }
 
   Widget _buildError(ApiError error) {

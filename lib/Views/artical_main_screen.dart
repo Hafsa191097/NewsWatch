@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:news_api_flutter_package/model/article.dart';
 import 'package:news_api_flutter_package/news_api_flutter_package.dart';
@@ -12,28 +14,37 @@ class ArticleScreen extends StatelessWidget {
    ArticleScreen({super.key});
 
   static const route = '/article';
+  final NewsAPI newsAPI = NewsAPI("e5ef803bf7b64de4b21da03a663492e7");
   
   @override
   Widget build(BuildContext context) {
     final article = ModalRoute.of(context)!.settings.arguments as Article;
-    return ImageContainer(
-      width: double.infinity,
-      imageUrl: article.urlToImage,
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          iconTheme: const IconThemeData(color: Colors.white),
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-        ),
-        extendBodyBehindAppBar: true,
-        body: ListView(
-          children: [
-            _NewsHeadline(article: article),
-            _NewsBody(article: article)
-          ],
-        ),
-      ),
+    return FutureBuilder<Article>(
+      future: Future.value(article),
+      builder:  (BuildContext context, AsyncSnapshot<Article> articless) {
+        return articless.connectionState == ConnectionState.done
+              ? articless.hasData
+                  ?   ImageContainer(
+          width: double.infinity,
+          imageUrl: articless.data!.urlToImage,
+          child: Scaffold(
+            backgroundColor: Colors.transparent,
+            appBar: AppBar(
+              iconTheme: const IconThemeData(color: Colors.white),
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+            ),
+            extendBodyBehindAppBar: true,
+            body: ListView(
+              children: [
+                _NewsHeadline(article: article),
+                // _NewsBody(article: article)
+              ],
+            ),
+          ),
+        ): _buildError(articless.error as ApiError)
+              : _buildProgress();
+      }
     );
   }
 }
@@ -57,9 +68,10 @@ class _NewsBody extends StatelessWidget {
         ),
         color: Colors.white,
       ),
-      child: FutureBuilder<List<Article>>(
-        future: newsAPI.getTopHeadlines(country: "us"),
-        builder:  (BuildContext context, AsyncSnapshot<List<Article>> snapshot) {
+      child: FutureBuilder<Article>(
+        future: Future.value(article),
+        builder:  (BuildContext context, AsyncSnapshot<Article> snapshot) {
+          
           return snapshot.connectionState == ConnectionState.done
               ? snapshot.hasData
                   ? Column(
@@ -72,12 +84,12 @@ class _NewsBody extends StatelessWidget {
                       CircleAvatar(
                         radius: 10,
                         backgroundImage: NetworkImage(
-                          snapshot.data!.first.urlToImage!,
+                          snapshot.data!.urlToImage!,
                         ),
                       ),
                       const SizedBox(width: 10),
                       Text(
-                        snapshot.data!.first.author!,
+                        snapshot.data!.author!,
                         style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                               color: Colors.white,
                             ),
@@ -94,7 +106,7 @@ class _NewsBody extends StatelessWidget {
                       ),
                       const SizedBox(width: 10),
                       Text(
-                        '${snapshot.data!.first.publishedAt}h',
+                        '${snapshot.data!.publishedAt}h',
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
                     ],
@@ -115,7 +127,7 @@ class _NewsBody extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               Text(
-                snapshot.data!.first.title!,
+                snapshot.data!.title!,
                 style: Theme.of(context)
                     .textTheme
                     .headlineSmall!
@@ -123,7 +135,7 @@ class _NewsBody extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               Text(
-                snapshot.data!.first.description!,
+                snapshot.data!.description!,
                 style:
                     Theme.of(context).textTheme.bodyMedium!.copyWith(height: 1.5),
               ),
@@ -138,7 +150,7 @@ class _NewsBody extends StatelessWidget {
                   itemBuilder: (context, index) {
                     return ImageContainer(
                       width: MediaQuery.of(context).size.width * 0.42,
-                      imageUrl: snapshot.data![index].urlToImage,
+                      imageUrl: snapshot.data!.urlToImage,
                       margin: const EdgeInsets.only(right: 5.0, bottom: 5.0),
                     );
                   })
@@ -163,11 +175,13 @@ class _NewsHeadline extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(20.0),
-      child: FutureBuilder<List<Article>>(
-        future: newsAPI.getTopHeadlines(country: "us"),
-        builder: (BuildContext context, AsyncSnapshot<List<Article>> articless)  {
+      child: FutureBuilder<Article>(
+        future: Future.value(article),
+        builder: (BuildContext context, AsyncSnapshot<Article> articless)  {
+          
+          log(articless.data!.source.category!);
           return articless.connectionState == ConnectionState.done
-              ? articless.hasData
+              && articless.hasData
                   ?  Column(
             mainAxisAlignment: MainAxisAlignment.end,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -176,10 +190,12 @@ class _NewsHeadline extends StatelessWidget {
                 height: MediaQuery.of(context).size.height * 0.15,
               ),
               CustomTag(
+                
                 backgroundColor: Colors.grey.withAlpha(150),
                 children: [
                   Text(
-                    articless.data!.first.source.category!,
+                    
+                    articless.data!.source.category!,
                     style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                           color: Colors.white,
                         ),
@@ -188,7 +204,7 @@ class _NewsHeadline extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               Text(
-                articless.data!.first.title!,
+                articless.data!.title!,
                 style: Theme.of(context).textTheme.headlineSmall!.copyWith(
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -197,15 +213,16 @@ class _NewsHeadline extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               Text(
-                articless.data!.first.source.name!,
+                articless.data!.source.name!,
                 style: Theme.of(context)
                     .textTheme
                     .bodyMedium!
                     .copyWith(color: Colors.white),
               ),
             ],
-          ) : _buildError(articless.error as ApiError)
-              : _buildProgress();
+          ) : _buildError(articless.error is ApiError ? articless.error as ApiError : ApiError("Unknown error",'404'));
+
+             
         }
       ),
     );
@@ -225,7 +242,7 @@ class _NewsHeadline extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              error.code ?? "",
+              error.code ?? "404",
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: 20),
             ),

@@ -58,13 +58,13 @@ class BreakingNews extends StatelessWidget {
                             arguments: articless.data![index],
                           );
                         },
-                        child: Column(
+                        child: articless.data != null ? Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            ImageContainer(
+                              ImageContainer(
                               width: MediaQuery.of(context).size.width * 0.5,
                               imageUrl: articless.data![index].urlToImage,
-                            ),
+                            ) ,
                             const SizedBox(height: 10),
                             Text(
                               articless.data![index].title!,
@@ -83,7 +83,7 @@ class BreakingNews extends StatelessWidget {
                             Text('by ${articless.data![index].author}',
                                 style: Theme.of(context).textTheme.bodySmall),
                           ],
-                        ),
+                        ) : const Center(child: Icon(Icons.error, color: Colors.redAccent,),),
                       ),
                     );
                   },
